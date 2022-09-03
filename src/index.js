@@ -10,6 +10,7 @@ const OPTIONS = 'image_type=photo&orientation=horizontal&safesearch=true';
 const DEFAULT_HITS = 40;
 
 let page = 1;
+let totalHits = 0;
 
 const form = {};
 
@@ -18,33 +19,44 @@ const refs = {
   gallery: document.querySelector('.gallery'),
   loadMore: document.querySelector('.load-more'),
 };
-console.log(refs.loadMore);
 
 refs.searchForm.addEventListener('input', onInputForm);
 refs.searchForm.addEventListener('submit', onSubmitForm);
 refs.loadMore.addEventListener('click', onLoadMoreBtnClick);
 
 function onInputForm(e) {
+  page = 1;
   form[e.target.name] = e.target.value.trim();
 }
 
 function onSubmitForm(e) {
   e.preventDefault();
   refs.gallery.innerHTML = '';
+  notVisibilityLoadMoreBtn();
   requestToCreateСollection(Object.values(form));
 }
 
 function addCardsToGallery(arr) {
   refs.gallery.insertAdjacentHTML('beforeend', createCardTemplate(arr));
+  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+  isVisibilityLoadMoreBtn();
   const lightbox = new SimpleLightbox('.gallery-card a', {
     captionDelay: 250,
   });
+
+  // if (response.hits.length === totalHits) {
+  //   notVisibilityLoadMoreBtn();
+  //   Notiflix.Notify.info(
+  //     'Were sorry, but youve reached the end of search results.'
+  //   );
+  // }
 }
 
 async function requestToCreateСollection(value) {
   try {
-    const arr = await processingRequest(value);
-    addCardsToGallery(arr);
+    const response = await processingRequest(value);
+    totalHits = response.totalHits;
+    addCardsToGallery(response.hits);
   } catch (error) {
     console.log(error);
   }
@@ -56,9 +68,10 @@ async function processingRequest(value) {
       `?key=${KEY}&q=${value}&${OPTIONS}&page=${page}&per_page=${DEFAULT_HITS}`
     );
     if (response.data.hits.length === 0) {
+      notVisibilityLoadMoreBtn();
       throw new Error();
     }
-    return response.data.hits;
+    return response.data;
   } catch (error) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again'
@@ -67,5 +80,14 @@ async function processingRequest(value) {
 }
 
 function onLoadMoreBtnClick(e) {
-  console.log('click');
+  page += 1;
+  requestToCreateСollection(Object.values(form));
+}
+
+function isVisibilityLoadMoreBtn() {
+  refs.loadMore.classList.add('is-visible');
+}
+
+function notVisibilityLoadMoreBtn() {
+  refs.loadMore.classList.remove('is-visible');
 }
