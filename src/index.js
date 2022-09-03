@@ -7,16 +7,22 @@ import SimpleLightbox from 'simplelightbox';
 axios.defaults.baseURL = 'https://pixabay.com/api/';
 const KEY = '29685313-2ba6443e06a4499ef383b21bf';
 const OPTIONS = 'image_type=photo&orientation=horizontal&safesearch=true';
+const DEFAULT_HITS = 40;
+
+let page = 1;
 
 const form = {};
 
 const refs = {
   searchForm: document.querySelector('#search-form'),
   gallery: document.querySelector('.gallery'),
+  loadMore: document.querySelector('.load-more'),
 };
+console.log(refs.loadMore);
 
 refs.searchForm.addEventListener('input', onInputForm);
 refs.searchForm.addEventListener('submit', onSubmitForm);
+refs.loadMore.addEventListener('click', onLoadMoreBtnClick);
 
 function onInputForm(e) {
   form[e.target.name] = e.target.value.trim();
@@ -24,9 +30,8 @@ function onInputForm(e) {
 
 function onSubmitForm(e) {
   e.preventDefault();
-  console.log(Object.values(form));
+  refs.gallery.innerHTML = '';
   requestToCreateСollection(Object.values(form));
-  refs.searchForm.reset();
 }
 
 function addCardsToGallery(arr) {
@@ -47,7 +52,9 @@ async function requestToCreateСollection(value) {
 
 async function processingRequest(value) {
   try {
-    const response = await axios.get(`?key=${KEY}&q=${value}&${OPTIONS}`);
+    const response = await axios.get(
+      `?key=${KEY}&q=${value}&${OPTIONS}&page=${page}&per_page=${DEFAULT_HITS}`
+    );
     if (response.data.hits.length === 0) {
       throw new Error();
     }
@@ -57,4 +64,8 @@ async function processingRequest(value) {
       'Sorry, there are no images matching your search query. Please try again'
     );
   }
+}
+
+function onLoadMoreBtnClick(e) {
+  console.log('click');
 }
