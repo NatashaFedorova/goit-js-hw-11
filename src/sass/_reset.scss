@@ -1,0 +1,42 @@
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+ul,
+ol {
+  margin: 0;
+  padding-left: 0;
+}
+.image {
+  display: block;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+.input,
+.textarea {
+  background-color: transparent;
+  outline: none;
+}
+.link {
+  text-decoration: none;
+}
+.logo--link {
+  text-decoration: none;
+}
+.list {
+  list-style-type: none;
+}
+
+.container {
+  //   outline: 1px solid red;
+  padding-left: 15px;
+  padding-right: 15px;
+  margin: 0 auto;
+  // width: 1200px;
+}
