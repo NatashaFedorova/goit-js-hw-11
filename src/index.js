@@ -40,7 +40,13 @@ function onSubmitForm(e) {
 function addCardsToGallery(arr) {
   refs.gallery.insertAdjacentHTML('beforeend', createCardTemplate(arr));
   successMessage();
-  compareNumberOfCardsAndTotalHits();
+
+  if (numberOfCards !== totalHits) {
+    isVisibilityLoadMoreBtn();
+  } else {
+    notVisibilityLoadMoreBtn();
+    infoMessage();
+  }
   defineLightboxParameters();
 }
 
@@ -81,15 +87,6 @@ function isVisibilityLoadMoreBtn() {
 
 function notVisibilityLoadMoreBtn() {
   refs.loadMore.classList.remove('is-visible');
-}
-
-function compareNumberOfCardsAndTotalHits() {
-  if (numberOfCards !== totalHits) {
-    isVisibilityLoadMoreBtn();
-  } else {
-    notVisibilityLoadMoreBtn();
-    infoMessage();
-  }
 }
 
 function defaultNumberOfCardsAndTotalHits() {
