@@ -11,6 +11,7 @@ const DEFAULT_HITS = 40;
 
 let page = 1;
 let totalHits = 0;
+let numberOfCards = 0;
 
 const form = {};
 
@@ -25,37 +26,29 @@ refs.searchForm.addEventListener('submit', onSubmitForm);
 refs.loadMore.addEventListener('click', onLoadMoreBtnClick);
 
 function onInputForm(e) {
-  page = 1;
+  defaultNumberOfCardsAndTotalHits();
   form[e.target.name] = e.target.value.trim();
 }
 
 function onSubmitForm(e) {
   e.preventDefault();
-  refs.gallery.innerHTML = '';
+  clearGallery();
   notVisibilityLoadMoreBtn();
   requestToCreateСollection(Object.values(form));
 }
 
 function addCardsToGallery(arr) {
   refs.gallery.insertAdjacentHTML('beforeend', createCardTemplate(arr));
-  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-  isVisibilityLoadMoreBtn();
-  const lightbox = new SimpleLightbox('.gallery-card a', {
-    captionDelay: 250,
-  });
-
-  // if (response.hits.length === totalHits) {
-  //   notVisibilityLoadMoreBtn();
-  //   Notiflix.Notify.info(
-  //     'Were sorry, but youve reached the end of search results.'
-  //   );
-  // }
+  successMessage();
+  compareNumberOfCardsAndTotalHits();
+  defineLightboxParameters();
 }
 
 async function requestToCreateСollection(value) {
   try {
     const response = await processingRequest(value);
     totalHits = response.totalHits;
+    numberOfCards += response.hits.length;
     addCardsToGallery(response.hits);
   } catch (error) {
     console.log(error);
@@ -73,13 +66,11 @@ async function processingRequest(value) {
     }
     return response.data;
   } catch (error) {
-    Notiflix.Notify.failure(
-      'Sorry, there are no images matching your search query. Please try again'
-    );
+    failureMessage();
   }
 }
 
-function onLoadMoreBtnClick(e) {
+function onLoadMoreBtnClick() {
   page += 1;
   requestToCreateСollection(Object.values(form));
 }
@@ -90,4 +81,43 @@ function isVisibilityLoadMoreBtn() {
 
 function notVisibilityLoadMoreBtn() {
   refs.loadMore.classList.remove('is-visible');
+}
+
+function compareNumberOfCardsAndTotalHits() {
+  if (numberOfCards !== totalHits) {
+    isVisibilityLoadMoreBtn();
+  } else {
+    notVisibilityLoadMoreBtn();
+    infoMessage();
+  }
+}
+
+function defaultNumberOfCardsAndTotalHits() {
+  page = 1;
+  numberOfCards = 0;
+}
+
+function defineLightboxParameters() {
+  return (lightbox = new SimpleLightbox('.gallery-card a', {
+    captionDelay: 250,
+  }));
+}
+
+function clearGallery() {
+  refs.gallery.innerHTML = '';
+}
+
+function successMessage() {
+  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+}
+
+function infoMessage() {
+  Notiflix.Notify.info(
+    'Were sorry, but youve reached the end of search results.'
+  );
+}
+function failureMessage() {
+  Notiflix.Notify.failure(
+    'Sorry, there are no images matching your search query. Please try again'
+  );
 }
