@@ -12,6 +12,7 @@ const DEFAULT_HITS = 40;
 let page = 1;
 let totalHits = 0;
 let numberOfCards = 0;
+let value;
 
 const form = {};
 
@@ -27,11 +28,15 @@ refs.loadMore.addEventListener('click', onLoadMoreBtnClick);
 
 function onInputForm(e) {
   defaultNumberOfCardsAndTotalHits();
-  form[e.target.name] = e.target.value.trim();
+  value = e.target.value.trim();
+  form[e.target.name] = value;
 }
 
 function onSubmitForm(e) {
   e.preventDefault();
+  if (value.length === 0) {
+    return;
+  }
   clearGallery();
   notVisibilityLoadMoreBtn();
   requestToCreateСollection(Object.values(form));
@@ -47,7 +52,8 @@ function addCardsToGallery(arr) {
     notVisibilityLoadMoreBtn();
     infoMessage();
   }
-  defineLightboxParameters();
+  const lightbox = defineLightboxParameters();
+  lightbox.refresh();
 }
 
 async function requestToCreateСollection(value) {
@@ -95,9 +101,9 @@ function defaultNumberOfCardsAndTotalHits() {
 }
 
 function defineLightboxParameters() {
-  return (lightbox = new SimpleLightbox('.gallery-card a', {
+  return new SimpleLightbox('.gallery-card a', {
     captionDelay: 250,
-  }));
+  });
 }
 
 function clearGallery() {
@@ -110,7 +116,7 @@ function successMessage() {
 
 function infoMessage() {
   Notiflix.Notify.info(
-    'Were sorry, but youve reached the end of search results.'
+    'We&#39re sorry, but you&#39ve reached the end of search results.'
   );
 }
 function failureMessage() {
